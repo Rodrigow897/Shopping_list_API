@@ -1,4 +1,3 @@
-const { use } = require('react');
 const pool = require('../dataBase/db');
 
 const createUsers = async(req, res) =>{
@@ -28,10 +27,14 @@ const getUsers = async(_, res) =>{
 const updateUsers = async (req, res) => {
     const {id} = req.params
     const {name} = req.body
+
     try {
         const user = await pool.query('UPDATE tb_users SET name = $1 WHERE id = $2 RETURNING *',
             [name, id]
-        )
+        );
+         if (user.rows.length === 0) {
+            return res.status(404).json({ error: 'user not found' });
+        }
         res.status(201).json(user.rows[0])
     } catch (err) {
         console.log('error updating user', err)
@@ -44,10 +47,13 @@ const deleteUsers = async(req, res) =>{
     try {
         const user = await pool.query('DELETE FROM tb_users WHERE id = $1',
             [id]
-        )
+        );
+        if (user.rows.length === 0) {
+            return res.status(404).json({ error: 'user not found' });
+        }
         res.status(201).json({message: 'user deleted successfully'})
     } catch (err) {
-        console.log('error deleting user')
+        console.log('error deleting user', err)
         res.status(500).json({error: 'error deleting user'})
     }
 }

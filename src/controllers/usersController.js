@@ -45,11 +45,9 @@ const updateUsers = async (req, res) => {
 const deleteUsers = async(req, res) =>{
     const {id} = req.params
     try {
-        const user = await pool.query('DELETE FROM tb_users WHERE id = $1',
-            [id]
-        );
-        if (user.rows.length === 0) {
-            return res.status(404).json({ error: 'user not found' });
+        const user = await pool.query('DELETE FROM tb_users WHERE id = $1',[id])
+        if (user.rowCount === 0) {
+            return res.status(404).json({error: 'user not found'});
         }
         res.status(201).json({message: 'user deleted successfully'})
     } catch (err) {
